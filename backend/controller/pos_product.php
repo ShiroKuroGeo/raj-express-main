@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($data['action']) && $data['action'] === 'delete') {
         $product_id = $data['product_id'];
 
-        $stmt = $pdo->prepare("DELETE FROM `products` WHERE `product_id` = ?");
+        $stmt = $pdo->prepare("UPDATE `products` SET `product_status`= 'inactive' WHERE `product_id` = ?");
         $result = $stmt->execute([$product_id]);
 
         if ($result) {

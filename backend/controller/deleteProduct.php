@@ -13,13 +13,13 @@ try {
     $database = new Database();
     $db = $database->getDb();
 
-    $deleteProductSQL = "DELETE FROM `products` WHERE `product_id` = :product_id";
+    $deleteProductSQL = "UPDATE `products` SET `product_status`= 'inactive' WHERE `product_id` = :product_id";
     $deleteProductStmt = $db->prepare($deleteProductSQL);
     $deleteProductStmt->bindParam(":product_id", $data['product_id']);
     $result = $deleteProductStmt->execute();
     
     if ($result) {
-        $set->sendJsonResponse(["success" => "Product successfully deleted!"], 200);
+        $set->sendJsonResponse(["success" => "Product is updated due to soft delete and successfully."], 200);
     } else {
         $set->sendJsonResponse(["error" => "Failed to delete product!"], 400);
     }

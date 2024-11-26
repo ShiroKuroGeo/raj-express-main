@@ -55,7 +55,14 @@
       </q-card-section>
 
       <q-card-actions align="center">
-        <q-btn
+        <q-btn v-if="productStatus == 'Not Available'"
+          color="red"
+          disable
+          label="Not Available"
+          @click="addToCart"
+           style="width: 200px; margin-top: 20px"
+        />
+        <q-btn v-else
           :disable="totalPrice < 50"
           color="red"
           :label="totalPrice < 50 ? 'Price must 50 above' : 'Add To Cart'"
@@ -79,6 +86,7 @@ export default {
   data(){
     return{
       quantity: 1,
+      productStatus: null,
       product: [],
       addons: [],
     }
@@ -100,7 +108,9 @@ export default {
             rating: 5,
             description: response.data.product_description,
             image: response.data.product_image,
+            status: response.data.product_status,
           }
+          this.productStatus = response.data.product_status;
         }else{
           throw new Error(data.error || 'Failed to fetch products data');
         }

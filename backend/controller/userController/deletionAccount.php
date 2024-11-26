@@ -1,23 +1,16 @@
 <?php
 include '../controller.php';
-
-$set = new controller();
-
-$set->setCorsOrigin();
-
-$data = $set->setInputData();
-
 include "../../connection/dbconfig.php"; 
 
+$set = new controller();
+$set->setCorsOrigin();
+$data = $set->setInputData();
 $headers = apache_request_headers();
 $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
 
 try {
     $database = new Database();
     $db = $database->getDb();
-
-    // Request delete should be 14 days before the deletion process is complete
-    // No data will be remove or delete, instead the user status is archive
     
     $query = "UPDATE `users` SET `date_deletion` = :delDate WHERE `user_id` = :user_id";
     $stmt = $db->prepare($query);

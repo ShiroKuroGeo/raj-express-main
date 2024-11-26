@@ -89,9 +89,9 @@ try {
         $category_id = $data['category_id'] ?? null;
 
         if ($category_id) {
-            $stmt = $pdo->prepare("DELETE FROM categories WHERE category_id = :category_id");
+            $stmt = $pdo->prepare("UPDATE `categories` SET `category_status`= 'inactive' WHERE category_id = :category_id");
             $stmt->execute([':category_id' => $category_id]);
-            sendResponse(["success" => true, "message" => "Category deleted successfully."]);
+            sendResponse(["success" => true, "message" => "Category is updated due to soft deleted and successfully."]);
         } else {
             sendResponse(["success" => false, "error" => "Category ID is required."], 400);
         }
