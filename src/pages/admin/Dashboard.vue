@@ -4,40 +4,42 @@
     <p class="text-grey-8">Here’s what’s happening with your R.A.J. business today.</p>
 
     <div class="row q-col-gutter-md">
-      <div class="col-md-8 col-sm-12">
+      <div class="col-12 col-md-6">
         <q-card>
           <q-card-section>
-            <div class="text-h6">Order Statistics</div>
-            <q-btn-toggle v-model="orderStatsTimeframe" flat stretch toggle-color="primary" :options="[ { label: 'This Month', value: 'month' }, { label: 'This Week', value: 'week' }, { label: 'Today', value: 'day' } ]" />
-            <apexchart type="bar" :options="chartOptions" :series="chartSeries" />
+            <div class="text-h6 row q-col-gutter-md">
+              <span class="col-8">Order Statistics</span> 
+              <q-select class="col-4" v-model="orderStatistics" :options="orderStatisticsOptions" label="Select Statistics" dense emit-value/>
+            </div>
+            <apexchart type="pie" :options="orderChartOptions" :series="orderSeries" />
           </q-card-section>
         </q-card>
       </div>
-    </div>
-    
-    <div class="row q-col-gutter-md">
-      <div class="col-md-8 col-sm-12">
+      <div class="col-12 col-md-6">
         <q-card>
           <q-card-section>
-            <div class="text-h6">POS Order Statistics</div>
-            <q-btn-toggle v-model="orderStatsTimeframe" flat stretch toggle-color="primary" :options="[ { label: 'This Month', value: 'month' }, { label: 'This Week', value: 'week' }, { label: 'Today', value: 'day' } ]" />
-            <apexchart type="bar" :options="chartOptionsOrder" :series="chartSeries" />
+            <div class="text-h6 row q-col-gutter-md">
+              <div class="text-h6">POS Order Statistics</div>
+            </div>
+            <apexchart type="line" :options="posChartOptions" :series="posOrderSeries" />
+          </q-card-section>
+        </q-card>
+      </div>
+      <div class="col-12">
+        <q-card>
+          <q-card-section>
+            <div class="text-h6 row q-col-gutter-md">
+              <span class="col-8">Earning Statistics</span> 
+            </div>
+            <apexchart type="bar" :options="orderEarnedChartOptions" :series="orderEarnedSeries" />
           </q-card-section>
         </q-card>
       </div>
     </div>
 
+    <!-- This below here is already done! -->
     <div class="row q-col-gutter-md q-mt-md">
-      <div class="col-md-8 col-sm-12">
-        <q-card>
-          <q-card-section>
-            <div class="text-h6">Earning Statistics</div>
-            <q-btn-toggle v-model="earningStatsTimeframe" flat stretch toggle-color="primary" :options="[ { label: 'This Month', value: 'month' }, { label: 'This Week', value: 'week' }, { label: 'Today', value: 'day' } ]" />
-            <apexchart type="bar" :options="chartOptionsEarning" :series="chartSeriesEarning" />
-          </q-card-section>
-        </q-card>
-      </div>
-      <div class="col-md-4 col-sm-12">
+      <div class="col-sm-12 col-md-6">
         <q-card>
           <q-card-section class="row items-center justify-between">
             <div class="text-h6">Recent Order</div>
@@ -46,10 +48,7 @@
           <q-table :rows="recentOrder" :columns="recentColumns" row-key="user_id" title="Recent Order (5)" class="text-capitalize" > </q-table>
         </q-card>
       </div>
-    </div>
-
-    <div class="row q-col-gutter-md q-mt-md">
-      <div class="col-md-4 col-sm-12">
+      <div class="col-sm-12 col-md-6">
         <q-card>
           <q-card-section class="row items-center justify-between">
             <div class="text-h6">Top Selling Product</div>
@@ -58,16 +57,7 @@
           <q-table :rows="recentOrder" :columns="recentColumns" row-key="user_id" title="Top Selling Products (5)" class="text-capitalize" > </q-table>
         </q-card>
       </div>
-      <!-- Most Selling and top selling di ba pariha ramana in terms of logic? dili lang nako apilon -->
-      <!-- <div class="col-md-4 col-sm-12">
-        <q-card>
-          <q-card-section class="row items-center justify-between">
-            <div class="text-h6">Most Selling Product</div>
-            <q-btn flat color="primary" label="View All" />
-          </q-card-section>
-        </q-card>
-      </div> -->
-      <div class="col-md-4 col-sm-12">
+      <div class="col-12">
         <q-card>
           <q-card-section class="row items-center justify-between">
             <div class="text-h6">Top Customer</div>
@@ -92,49 +82,143 @@ export default {
   data() {
     return {
       adminName: 'Raj Express',
-      orderStatsTimeframe: 'month',
-      monthTotal: 0,
+
+      // Order Series
+      orderStatistics: 'today',
+      orderStatisticsOptions: [
+        { label: "This day", value: "today" },
+        { label: "This month", value: "month" },
+        { label: "This week", value: "week" },
+        { label: "This year", value: "year" },
+      ],
+      orderSeries: [1, 1, 1],
+      orderChartOptions: {
+        chart: {
+          type: "pie",
+        },
+        labels: ["Pending", "Delivered", "Cancelled"], 
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 300,
+                height: 500,
+              },
+              legend: {
+                position: "bottom",
+              },
+            },
+          },
+        ],
+      },
+      orderEarnedSeries: [
+        {
+          name: ["Total Earned"],
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        },
+      ],
+      orderEarnedChartOptions: {
+        chart: {
+          type: "line",
+          toolbar: {
+            show: true,
+          },
+        },
+        xaxis: {
+          categories: ["Jan", "Feb", "Mar", "Apr", "May", 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          title: {
+            text: "Days",
+          },
+        },
+        yaxis: {
+          title: {
+            text: "Number of Orders",
+          },
+        },
+        stroke: {
+          curve: "smooth", 
+        },
+        title: {
+          text: "Order Trends",
+          align: "center",
+        },
+        markers: {
+          size: 5,
+          hover: {
+            size: 7,
+          },
+        },
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 300,
+                height: 500,
+              },
+              legend: {
+                position: "bottom",
+              },
+            },
+          },
+        ],
+      },
+      
+      // POS Order Statistics
+      posOrderSeries: [
+        {
+          name: ["POS Orders"],
+          data: [0, 0, 0, 0, 0],
+        }
+      ],
+      posChartOptions: {
+        chart: {
+          type: "line",
+          toolbar: {
+            show: true,
+          },
+        },
+        xaxis: {
+          categories: ["Today", "Yesterday", "This Week", "This Month", "This Year"],
+          title: {
+            text: "Days",
+          },
+        },
+        yaxis: {
+          title: {
+            text: "Number of Orders",
+          },
+        },
+        stroke: {
+          curve: "smooth", 
+        },
+        title: {
+          text: "Order Trends",
+          align: "center",
+        },
+        markers: {
+          size: 5,
+          hover: {
+            size: 7,
+          },
+        },
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 300,
+                height: 500,
+              },
+              legend: {
+                position: "bottom",
+              },
+            },
+          },
+        ],
+      },
       newOrders: 0,
-      dayTotal: 0,
-      weekTotal: 0,
-      chartSeries: [],
-      chartOptions: {
-        chart: {
-          id: 'simple-bar',
-          toolbar: { show: true }
-        },
-        xaxis: {
-          categories: []
-        },
-        colors: ['#3B82F6'],
-        plotOptions: {
-          bar: {
-            borderRadius: 4,
-            horizontal: true
-          }
-        }
-      },
-      earningStatsTimeframe: 'month',
-      monthTotalEarning: 0,
-      dayTotalEarning: 0,
-      weekTotalEarning: 0,
-      chartSeriesEarning: [],
-      chartOptionsEarning: {
-        chart: {
-          id: 'simple-bar',
-          toolbar: { show: true }
-        },
-        xaxis: {
-          categories: []
-        },
-        colors: ['#3B82F6'],
-        plotOptions: {
-          bar: {
-            borderRadius: 4,
-            horizontal: true
-          }
-        }
-      },
       recentOrder: [],
       recentColumns: [
         { name: "customerRef", label: "Customer Reference", align: "left", field: (row) => row.customer_reference},
@@ -156,101 +240,128 @@ export default {
     }
   },
   watch: {
-    orderStatsTimeframe: {
-      immediate: true,
-      handler() {
-        this.updateChartData();
-      }
+    orderStatistics(newValue) {
+      this.selectedOption(newValue);
     },
-    earningStatsTimeframe: {
-      immediate: true,
-      handler() {
-        this.updateChartDataEarning();
-      }
-    }
   },
   methods: {
-    async getMonthEarningOrderStatistics() {
-      try {
-        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/earnings/orderMonthController.php');
-        this.monthTotalEarning = response.data.total.total;
-      } catch (error) {
-        console.log('Error in ' + error);
+    selectedOption(value) {
+      if(value == 'today'){
+        this.fetchTodayOrderStatistics();
+      } else if(value == 'week'){
+        this.fetchWeekOrderStatistics();
+      } else if(value == 'month'){
+        this.fetchMonthOrderStatistics();
+      } else if(value == 'year'){
+        this.fetchYearOrderStatistics();
+      } else {
+        console.log(value);
       }
     },
-    async getDayEarningOrderStatistics() {
+    async fetchEarnedStatistics(){
       try {
-        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/earnings/orderDayController.php');
-        this.dayTotalEarning = response.data.total.total;
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/earned.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderEarnedSeries[0].data = data.monthlySales;
+        }
       } catch (error) {
-        console.log('Error in ' + error);
+        console.log('Error in '+ error);
       }
     },
-    async getWeekEarningOrderStatistics() {
+    async fetchMonthEarnedStatistics(){
       try {
-        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/earnings/orderWeekController.php');
-        this.weekTotalEarning = response.data.total.total;
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/ordersEarning/month.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderEarnedSeries = data.orderSeries;
+        }
       } catch (error) {
-        console.log('Error in ' + error);
+        console.log('Error in '+ error);
       }
     },
-    async getMonthOrderStatistics() {
+    async fetchWeekEarnedStatistics(){
       try {
-        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/orderMonthController.php');
-        this.monthTotal = response.data.total.total;
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/ordersEarning/week.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderEarnedSeries = data.orderSeries;
+        }
       } catch (error) {
-        console.log('Error in ' + error);
+        console.log('Error in '+ error);
       }
     },
-    async getDayOrderStatistics() {
+    async fetchTodayEarnedStatistics(){
       try {
-        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/orderDayController.php');
-        this.dayTotal = response.data.total.total;
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/ordersEarning/today.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderEarnedSeries = data.orderSeries;
+        }
       } catch (error) {
-        console.log('Error in ' + error);
+        console.log('Error in '+ error);
       }
     },
-    async getWeekOrderStatistics() {
-      try {
-        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/orderWeekController.php');
-        this.weekTotal = response.data.total.total;
-      } catch (error) {
-        console.log('Error in ' + error);
-      }
-    },
-    updateChartData() {
-      const todayData = this.dayTotal;
-      const weekData = this.weekTotal;
-      const monthData = this.monthTotal;
 
-      if (this.orderStatsTimeframe === 'day') {
-        this.chartSeries = [{ name: 'Today', data: [todayData] }];
-        this.chartOptions.xaxis.categories = ['Today'];
-      } else if (this.orderStatsTimeframe === 'week') {
-        this.chartSeries = [{ name: 'This Week', data: [weekData] }];
-        this.chartOptions.xaxis.categories = ['This Week'];
-      } else if (this.orderStatsTimeframe === 'month') {
-        this.chartSeries = [{ name: 'This Month', data: [monthData] }];
-        this.chartOptions.xaxis.categories = ['This Month'];
+    async fetchYearOrderStatistics(){
+      try {
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/ordersCount/year.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderSeries = data.orderSeries;
+        }
+      } catch (error) {
+        console.log('Error in '+ error);
       }
     },
-    updateChartDataEarning() {
-      const todayData = this.dayTotalEarning;
-      const weekData = this.weekTotalEarning;
-      const monthData = this.monthTotalEarning;
-      
-      if (this.earningStatsTimeframe === 'day') {
-        this.chartSeriesEarning = [{ name: 'Today', data: [todayData] }];
-        this.chartOptionsEarning.xaxis.categories = ['Today'];
-      } else if (this.earningStatsTimeframe === 'week') {
-        this.chartSeriesEarning = [{ name: 'This Week', data: [weekData] }];
-        this.chartOptionsEarning.xaxis.categories = ['This Week'];
-      } else if (this.earningStatsTimeframe === 'month') {
-        this.chartSeriesEarning = [{ name: 'This Month', data: [monthData] }];
-        this.chartOptionsEarning.xaxis.categories = ['This Month'];
-      }else{
-        this.chartSeriesEarning = [{ name: 'This Month', data: [monthData] }];
-        this.chartOptionsEarning.xaxis.categories = ['This Month'];
+    async fetchMonthOrderStatistics(){
+      try {
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/ordersCount/month.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderSeries = data.orderSeries;
+        }
+      } catch (error) {
+        console.log('Error in '+ error);
+      }
+    },
+    async fetchWeekOrderStatistics(){
+      try {
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/ordersCount/week.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderSeries = data.orderSeries;
+        }
+      } catch (error) {
+        console.log('Error in '+ error);
+      }
+    },
+    async fetchTodayOrderStatistics(){
+      try {
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/ordersCount/today.php');
+        const data = response.data;
+        if (data.success) {
+          this.orderSeries = data.orderSeries;
+        }
+      } catch (error) {
+        console.log('Error in '+ error);
+      }
+    },
+    async fetchPosOrderStatistics(){
+      try {
+        const response = await axios.get('http://localhost/raj-express/backend/controller/adminController/dashboardController/posOrderStatisticsController.php');
+        const data = response.data;
+        if (data.success) {
+          this.posOrderSeries[0].data = [
+            data.today,
+            data.yesterday,
+            data.thisWeek,
+            data.thisMonth,
+            data.thisYear,
+          ];
+        }
+      } catch (error) {
+        console.log('Error in '+ error);
       }
     },
     async fetchRecentOrder(){
@@ -299,17 +410,12 @@ export default {
     }
   },
   mounted() {
-    this.getMonthOrderStatistics();
-    this.getDayOrderStatistics();
-    this.getWeekOrderStatistics();
-    this.fetchTopCustomer();
-    this.updateChartData();
-    this.updateChartDataEarning();
-    this.getMonthEarningOrderStatistics();
-    this.getDayEarningOrderStatistics();
-    this.getWeekEarningOrderStatistics();
+    this.selectedOption(this.orderStatistics);
+    this.fetchEarnedStatistics();
     this.fetchRecentOrder();
+    this.fetchPosOrderStatistics();
     this.fetchTopSelling();
+    this.fetchTopCustomer();
     this.newOrderNotification();
     setInterval(() => {
       this.orderNotification();
